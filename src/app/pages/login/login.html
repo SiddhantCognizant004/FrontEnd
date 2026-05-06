@@ -1,0 +1,144 @@
+<div class="login-page">
+  <div class="login-left">
+    <div class="login-brand">
+      <website-name></website-name>
+    </div>
+    <div class="login-hero">
+      <div class="hero-tagline">Agricultural Supply Chain</div>
+      <h1 class="hero-title">
+        {{ account_method() === 'login' ? 'Welcome\nBack' : 'Join\nAgriChain' }}
+      </h1>
+      <p class="hero-desc">
+        {{ account_method() === 'login'
+          ? 'Sign in to access your personalized dashboard and manage your agricultural operations.'
+          : 'Create your account and become part of the AgriChain ecosystem.' }}
+      </p>
+    </div>
+    <div class="login-decorations">
+      <div class="deco-circle deco-1"></div>
+      <div class="deco-circle deco-2"></div>
+      <div class="deco-circle deco-3"></div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="login-card">
+      <!-- Method toggle -->
+      <div class="method-tabs">
+        <button class="method-tab" [class.active]="account_method() === 'login'" (click)="onAccountMethodChange('login')">Sign In</button>
+        <button class="method-tab" [class.active]="account_method() === 'signup'" (click)="onAccountMethodChange('signup')">Register</button>
+        <div class="method-indicator" [class.right]="account_method() === 'signup'"></div>
+      </div>
+
+      <form class="login-form" (ngSubmit)="onSubmit()">
+
+        <!-- ROLE SELECTOR -->
+        <div class="role-section">
+          <label class="section-label">
+            {{ account_method() === 'login' ? 'I am logging in as' : 'I am registering as' }}
+          </label>
+          <div class="role-chips">
+            <label class="role-chip" [class.active]="role_selected() === 'FARMER'" for="r-farmer">
+              <input type="radio" id="r-farmer" name="role" value="FARMER"
+                [checked]="role_selected() === 'FARMER'" (change)="onRoleChange('FARMER')">
+              <span class="chip-icon">🌾</span>
+              <span>Farmer</span>
+            </label>
+            <label class="role-chip" [class.active]="role_selected() === 'TRADER'" for="r-trader">
+              <input type="radio" id="r-trader" name="role" value="TRADER"
+                [checked]="role_selected() === 'TRADER'" (change)="onRoleChange('TRADER')">
+              <span class="chip-icon">📦</span>
+              <span>Trader</span>
+            </label>
+            @if(account_method() === 'login') {
+              <label class="role-chip" [class.active]="role_selected() === 'OFFICER'" for="r-officer">
+                <input type="radio" id="r-officer" name="role" value="OFFICER"
+                  [checked]="role_selected() === 'OFFICER'" (change)="onRoleChange('OFFICER')">
+                <span class="chip-icon">🔍</span>
+                <span>Officer</span>
+              </label>
+              <label class="role-chip" [class.active]="role_selected() === 'MANAGER'" for="r-manager">
+                <input type="radio" id="r-manager" name="role" value="MANAGER"
+                  [checked]="role_selected() === 'MANAGER'" (change)="onRoleChange('MANAGER')">
+                <span class="chip-icon">🏢</span>
+                <span>Manager</span>
+              </label>
+              <label class="role-chip" [class.active]="role_selected() === 'ADMIN'" for="r-admin">
+                <input type="radio" id="r-admin" name="role" value="ADMIN"
+                  [checked]="role_selected() === 'ADMIN'" (change)="onRoleChange('ADMIN')">
+                <span class="chip-icon">🛡️</span>
+                <span>Admin</span>
+              </label>
+              <label class="role-chip" [class.active]="role_selected() === 'AUDITOR'" for="r-auditor">
+                <input type="radio" id="r-auditor" name="role" value="AUDITOR"
+                  [checked]="role_selected() === 'AUDITOR'" (change)="onRoleChange('AUDITOR')">
+                <span class="chip-icon">📋</span>
+                <span>Auditor</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <!-- SIGNUP ONLY FIELDS -->
+        @if(account_method() === 'signup') {
+          <div class="input-box">
+            <label for="name" class="input-label">Full Name</label>
+            <input type="text" id="name" name="name" class="input-field"
+              [(ngModel)]="formData.name" placeholder="Enter your full name" required>
+          </div>
+        }
+
+        <div class="input-box">
+          <label for="email" class="input-label">Email Address</label>
+          <input type="email" id="email" name="email" class="input-field"
+            [(ngModel)]="formData.email" placeholder="you@example.com" required>
+        </div>
+
+        @if(account_method() === 'signup') {
+          <div class="input-box">
+            <label for="phone" class="input-label">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="input-field"
+              [(ngModel)]="formData.phone" placeholder="10-digit mobile number" required>
+          </div>
+        }
+
+        <div class="input-box">
+          <label for="password" class="input-label">Password</label>
+          <input type="password" id="password" name="password" class="input-field"
+            [(ngModel)]="formData.password" placeholder="••••••••" required>
+        </div>
+
+        @if(account_method() === 'signup') {
+          <div class="input-box">
+            <label for="confirm-password" class="input-label">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirm-password" class="input-field"
+              [(ngModel)]="formData.confirmPassword" placeholder="••••••••" required>
+          </div>
+        }
+
+        @if(errorMsg()) {
+          <div class="error-alert">
+            <span>⚠️</span>
+            <span>{{ errorMsg() }}</span>
+          </div>
+        }
+
+        <button type="submit" class="submit-btn" [disabled]="loading()">
+          @if(loading()) {
+            <span class="btn-spinner"></span>
+            {{ account_method() === 'login' ? 'Signing in...' : 'Creating account...' }}
+          } @else {
+            {{ account_method() === 'login' ? 'Sign In' : 'Create Account' }}
+          }
+        </button>
+
+        @if(account_method() === 'signup') {
+          <p class="full-reg-note">
+            Farmer with documents?
+            <a routerLink="/register" class="link">Full Registration →</a>
+          </p>
+        }
+      </form>
+    </div>
+  </div>
+</div>

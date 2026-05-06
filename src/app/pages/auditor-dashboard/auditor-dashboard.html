@@ -1,0 +1,124 @@
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <span class="brand-icon">🔎</span>
+        <span class="brand-name">AgriChain</span>
+      </div>
+      <div class="brand-role">Auditor Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Navigation</span>
+      <button class="nav-item" [class.active]="activeTab()==='home'" (click)="setTab('home')">
+        <span class="nav-icon">🏠</span> Overview
+      </button>
+      <button class="nav-item" [class.active]="activeTab()==='users'" (click)="setTab('users')">
+        <span class="nav-icon">👥</span> Users
+      </button>
+      <button class="nav-item" [class.active]="activeTab()==='logs'" (click)="setTab('logs')">
+        <span class="nav-icon">📋</span> Audit Logs
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()"><span>🚪</span> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    <div class="topbar">
+      <span class="topbar-title">
+        @if(activeTab() === 'home') { Overview }
+        @if(activeTab() === 'users') { All Users (Read Only) }
+        @if(activeTab() === 'logs') { Audit Logs (Read Only) }
+      </span>
+    </div>
+    <div class="main-content">
+
+      @if(activeTab() === 'home') {
+        <div class="page-header">
+          <div>
+            <div class="page-title">Auditor Dashboard</div>
+            <div class="page-subtitle">Read-only access to system data and audit trails</div>
+          </div>
+        </div>
+        <div class="info-banner">🔒 Read-only access. You can view all users and audit logs but cannot make any changes.</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ users().length }}</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{{ logs().length }}</div>
+            <div class="stat-label">Audit Records (Page)</div>
+          </div>
+        </div>
+      }
+
+      @if(activeTab() === 'users') {
+        <div class="page-header">
+          <div class="page-title">All Users</div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <span class="table-title">User Registry — Read Only</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th></tr></thead>
+              <tbody>
+                @for(u of users(); track u.id) {
+                  <tr>
+                    <td><code>{{ u.id }}</code></td>
+                    <td style="font-weight:600">{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.phone }}</td>
+                    <td><span class="badge" [style.background]="userRoleColor(u.role)">{{ u.role | userRole }}</span></td>
+                    <td><span class="badge" [style.background]="userStatusColor(u.status)">{{ u.status | userStatus }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      @if(activeTab() === 'logs') {
+        <div class="page-header">
+          <div class="page-title">Audit Logs</div>
+          <div class="page-actions">
+            <button class="btn-export" (click)="exportLogs()">⬇️ Export CSV</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <span class="table-title">System Activity — Read Only</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>ID</th><th>Action</th><th>Performed By</th><th>Role</th><th>Details</th><th>Timestamp</th></tr></thead>
+              <tbody>
+                @for(log of logs(); track log.id) {
+                  <tr>
+                    <td><code>{{ log.id }}</code></td>
+                    <td><span class="badge" [style.background]="getActionColor(log.action)" style="font-size:0.7rem">{{ log.action }}</span></td>
+                    <td>{{ log.performedBy }}</td>
+                    <td>{{ log.role }}</td>
+                    <td [title]="log.details" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ truncate(log.details) }}</td>
+                    <td style="font-size:0.8rem;white-space:nowrap">{{ log.timestamp }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button class="btn-page" [disabled]="page() === 0" (click)="prevPage()">← Prev</button>
+            <span class="page-info">Page {{ page() + 1 }} of {{ totalPages() }}</span>
+            <button class="btn-page" [disabled]="page() >= totalPages() - 1" (click)="nextPage()">Next →</button>
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+</div>
